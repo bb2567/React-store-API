@@ -1,1 +1,18 @@
-{"users":[{"id":1,"nickname":"admin","email":"admin@163.com","password":"111111","type":1},{"id":2,"email":"mr.banbear@gmail.com","password":"111111","nickname":"andyx","type":0}]}
+{
+  "users": [
+    {
+      "id": 1,
+      "email": "admin@163.com",
+      "password": "111111",
+      "nickname": "admin", 
+      "type": 1
+    },
+    {
+      "id": 2,
+      "email": "mr.banbear@gmail.com",
+      "password": "111111",
+      "nickname": "andyx",
+      "type": 0
+    }
+  ]
+}

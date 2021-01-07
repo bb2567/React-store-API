@@ -42,7 +42,7 @@ server.post("/auth/login", (req, res) => {
     const { nickname, type } = user;
 
     //   jwt
-    const jwToken = createToken({ nickname, type });
+    const jwToken = createToken({ nickname, type, email });
     return res.status(200).json(jwToken);
   } else {
     const status = 401;

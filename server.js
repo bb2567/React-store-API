@@ -15,7 +15,7 @@ const getUsersDb = () => {
     fs.readFileSync(path.join(__dirname, "users.json"), "UTF-8")
   );
 };
-//   驗證
+//   驗證 email password 是否重複
 const isAuthenticated = ({ email, password }) => {
   return (
     getUsersDb().users.findIndex(
@@ -23,6 +23,12 @@ const isAuthenticated = ({ email, password }) => {
     ) !== -1
   );
 };
+
+// 驗證 email 是否重複
+const isExist = ({ email }) => {
+  return getUsersDb().users.findIndex((user) => user.email === email) !== -1;
+};
+
 // Jwt 註冊
 const SECRET = "12321JKLSJKLSDFJK23423432";
 const expiresIn = "1h";
@@ -51,15 +57,15 @@ server.post("/auth/login", (req, res) => {
   }
 });
 
-//  使用者註冊
+//  註冊新用戶
 // 拿取用戶註冊資料
 server.post("/auth/register", (req, res) => {
   const { email, password, nickname, type } = req.body;
 
   // 1 比對  email 已經註冊  return 401
-  if (isAuthenticated({ email, password })) {
+  if (isExist(email)) {
     const status = 401;
-    const message = "Email and Password already exist";
+    const message = "Email already exist";
     return res.status(status).json({ status, message });
   }
 
@@ -99,11 +105,10 @@ server.post("/auth/register", (req, res) => {
 // ---------------
 
 // server.use(/^(?!\/auth).*$/, (req, res, next) => {
-  // 多個
+// 多個
 // server.use(['/carts'], (req, res, next) => {
 
 server.use("/carts", (req, res, next) => {
-
   if (
     req.headers.authorization === undefined ||
     req.headers.authorization.split(" ")[0] !== "Bearer"
@@ -123,7 +128,7 @@ server.use("/carts", (req, res, next) => {
       res.status(status).json({ status, message });
       return;
     }
-    // next() 繼續處理原本 carts的請求 
+    // next() 繼續處理原本 carts的請求
     next();
   } catch (err) {
     const status = 401;

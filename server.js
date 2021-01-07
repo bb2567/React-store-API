@@ -51,8 +51,6 @@ server.post("/auth/login", (req, res) => {
   }
 });
 
-
-
 //  使用者註冊
 // 拿取用戶註冊資料
 server.post("/auth/register", (req, res) => {
@@ -65,7 +63,7 @@ server.post("/auth/register", (req, res) => {
     return res.status(status).json({ status, message });
   }
 
-  //  2 
+  //  2
   fs.readFile(path.join(__dirname, "users.json"), (err, _data) => {
     if (err) {
       const status = 401;
@@ -97,6 +95,48 @@ server.post("/auth/register", (req, res) => {
   const jwToken = createToken({ nickname, type, email });
   res.status(200).json(jwToken);
 });
+
+// ---------------
+
+// server.use(/^(?!\/auth).*$/, (req, res, next) => {
+  // 多個
+// server.use(['/carts'], (req, res, next) => {
+
+server.use("/carts", (req, res, next) => {
+
+  if (
+    req.headers.authorization === undefined ||
+    req.headers.authorization.split(" ")[0] !== "Bearer"
+  ) {
+    const status = 401;
+    const message = "Error in authorization format";
+    res.status(status).json({ status, message });
+    return;
+  }
+  try {
+    const verifyTokenResult = verifyToken(
+      req.headers.authorization.split(" ")[1]
+    );
+    if (verifyTokenResult instanceof Error) {
+      const status = 401;
+      const message = "Access token not provided";
+      res.status(status).json({ status, message });
+      return;
+    }
+    // next() 繼續處理原本 carts的請求 
+    next();
+  } catch (err) {
+    const status = 401;
+    const message = "Error token is revoked";
+    res.status(status).json({ status, message });
+  }
+});
+// 驗證 token
+const verifyToken = (token) => {
+  return jwt.verify(token, SECRET, (err, decode) =>
+    decode !== undefined ? decode : err
+  );
+};
 
 server.use(router);
 server.listen(3003, () => {
